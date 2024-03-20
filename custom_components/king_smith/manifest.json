@@ -1,0 +1,12 @@
+{
+  "domain": "king_smith",
+  "name": "Kingsmith WalkingPad",
+  "codeowners": [
+    "@ludeeus"
+  ],
+  "config_flow": true,
+  "documentation": "https://github.com/madmatah/hass-walkingpad",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/madmatah/hass-walkingpad/issues",
+  "version": "0.0.0"
+}
