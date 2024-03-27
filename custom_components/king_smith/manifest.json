@@ -1,12 +1,26 @@
 {
   "domain": "king_smith",
   "name": "Kingsmith WalkingPad",
+  "bluetooth": [
+    {
+      "local_name": "KS-ST-A1P"
+    }
+  ],
   "codeowners": [
-    "@ludeeus"
+    "@madmatah"
   ],
   "config_flow": true,
+  "dependencies": [
+    "bluetooth_adapters"
+  ],
   "documentation": "https://github.com/madmatah/hass-walkingpad",
-  "iot_class": "cloud_polling",
+  "integration_type": "device",
+  "iot_class": "local_polling",
   "issue_tracker": "https://github.com/madmatah/hass-walkingpad/issues",
-  "version": "0.0.0"
+  "requirements": [
+    "ph4-walkingpad==0.0.7"
+  ],
+  "ssdp": [],
+  "version": "0.1.0",
+  "zeroconf": []
 }

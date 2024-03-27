@@ -1,18 +1,32 @@
 {
     "config": {
-        "step": {
-            "user": {
-                "description": "If you need help with the configuration have a look here: https://github.com/ludeeus/integration_blueprint",
-                "data": {
-                    "username": "Username",
-                    "password": "Password"
-                }
-            }
+        "abort": {
+            "already_configured": "Device is already configured"
         },
         "error": {
-            "auth": "Username/Password is wrong.",
-            "connection": "Unable to connect to the server.",
-            "unknown": "Unknown error occurred."
+            "cannot_connect": "Failed to connect",
+            "unknown": "Unexpected error"
+        },
+        "step": {
+            "device": {
+                "data": {
+                    "mac": "Device",
+                    "name": "Name"
+                },
+                "description": "Congrats! Your WalkingPad has been automatically discovered. Please give it a friendly name for Home Assistant. ",
+                "title": "Walkingpad"
+            },
+            "user": {
+                "data": {
+                    "mac": "Device",
+                    "name": "Name"
+                },
+                "data_description": {
+                    "mac": "The MAC address of your Walkingpad."
+                },
+                "description": "If your Walkingpad is ON, it should be automatically discovered by Home Assistant. Use manual configuration only if you know what you are doing.",
+                "title": "Manual configuration of a Walkingpad"
+            }
         }
     }
 }
