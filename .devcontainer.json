@@ -1,6 +1,9 @@
 {
     "name": "ludeeus/integration_blueprint",
     "image": "mcr.microsoft.com/devcontainers/python:3.11-bullseye",
+    "runArgs": [
+        "-v/run/dbus:/run/dbus:ro"
+    ],
     "postCreateCommand": "scripts/setup",
     "forwardPorts": [
         8123
