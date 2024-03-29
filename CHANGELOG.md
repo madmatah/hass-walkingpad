@@ -17,5 +17,6 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - steps sensor
 - duration sensors (available in several units : minutes, hours, days)
 - current speed sensor
+- basic configuration guide in the README
 
 [unreleased]: https://github.com/madmatah/hass-walkingpad
