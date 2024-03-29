@@ -12,6 +12,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 - upgrade homeassistant to 2024.3.3
 
+### Fixed
+
+- warnings about invalid suggested_unit_of_measurement
+
 ## [0.1.0] - 2024-03-29
 
 ### Added
