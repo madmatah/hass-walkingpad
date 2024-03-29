@@ -8,6 +8,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- upgrade homeassistant to 2024.3.3
+
 ## [0.1.0] - 2024-03-29
 
 ### Added
