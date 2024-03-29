@@ -8,6 +8,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.1.0] - 2024-03-29
+
 ### Added
 
 - support for WalkingPad A1 Pro
@@ -19,4 +21,5 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - current speed sensor
 - basic configuration guide in the README
 
-[unreleased]: https://github.com/madmatah/hass-walkingpad
+[unreleased]: https://github.com/madmatah/compare/v0.1.0...main
+[0.1.0]: https://github.com/madmatah/hass-walkingpad/compare/eb2749688ebbf334fa29c5004511e8ee8680307f...v0.1.0
