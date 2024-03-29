@@ -23,8 +23,41 @@ Platform | Description
 
 ## Configuration
 
-(TODO)
+To add your WalkingPad device to Home assistant, you must have a bluetooth adapter configured or a bluetooth proxy. This part is documented in the [Bluetooth](https://www.home-assistant.io/integrations/bluetooth/) page of the official Home Assistant documentation.
 
+Before all, ensure that your WalkingPad device is not connected to any device, or it will not be detected.
+
+This custom integration offers 2 configuration modes :
+
+### 1. Automatic bluetooth discovery
+
+Your WalkingPad can be detected automatically by HomeAssistant if its name is recognized by this integration.
+
+In this case, you will see a new discovered device in `Settings > Devices & Services`.
+
+![Disvocered device](./assets/images/discovered-device.png)
+
+Just click and configure and enter a friendly name for your device:
+
+![Automatic config flow](./assets/images/bluetooth-config-flow.png)
+
+
+That's it!
+
+If your device is not detected, read the [FAQ](#my-walkingpad-device-is-not-detected) and try to use the Manual configuration mode.
+
+### 2. Manual configuration
+
+In `Settings > Devices & Services`, click on `Add integration` and look for `KingSmith WalkingPad` brand.
+
+If you click on it, it will open the manual configuration form:
+
+![Manual configuration](./assets/images/manual-config-flow.png)
+
+
+Enter your device MAC address in the "device" field and a friendly name in the "name" field.
+
+See the [FAQ](#my-walkingpad-device-is-not-detected) for more details.
 
 <!---->
 
@@ -101,6 +134,11 @@ Then, you can run the devcontainer and start Home Assistant with `scripts/develo
 You might have a TLS error on the first run in the logs. Just restart the command and everything should be fine, your bluetooth adapter should be detected by Home Assistant.
 
 
+## Acknowledgements
+
+This project uses [ph4-walkingpad](https://github.com/ph4r05/ph4-walkingpad) library to control the WalkingPad device. Thanks [@ph4r05](https://github.com/ph4r05)!
+
+This project takes inspiration and code from [@indiefan](https://github.com/indiefan)'s [king smith](https://github.com/indiefan/king_smith) custom integration.
 
 ***
 
