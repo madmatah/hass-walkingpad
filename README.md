@@ -13,6 +13,17 @@ Platform | Description
 
 ## Installation
 
+### HACS
+1. Open the HACS dashboard then click `Integrations`,
+1. Click the `3 dots menu` on the top right corner
+1. Click `Custom repository`
+1. Enter the repo url `https://github.com/madmatah/hass-walkingpad`
+1. Chose a the `Integration` category then **Submit**
+1. Click on the new `Kingsmith WalkingPad` repo
+1. Click on `Download` on the bottom right corner.
+1. Restart Home Assistant
+
+### Manual
 1. Using the tool of choice open the directory (folder) for your HA configuration (where you find `configuration.yaml`).
 1. If you do not have a `custom_components` directory (folder) there, you need to create it.
 1. In the `custom_components` directory (folder) create a new folder called `king_smith`.
