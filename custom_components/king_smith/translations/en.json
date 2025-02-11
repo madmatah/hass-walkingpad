@@ -13,7 +13,7 @@
                     "mac": "Device",
                     "name": "Name"
                 },
-                "description": "Congrats! Your WalkingPad has been automatically discovered. Please give it a friendly name for Home Assistant. ",
+                "description": "Congrats! Your WalkingPad has been automatically discovered. Please give it a friendly name for Home Assistant.",
                 "title": "Walkingpad"
             },
             "user": {
