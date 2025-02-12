@@ -3,7 +3,43 @@
   "name": "Kingsmith WalkingPad",
   "bluetooth": [
     {
-      "local_name": "KS-ST-A1P"
+      "local_name": "DYNAMAX*"
+    },
+    {
+      "local_name": "KINGSMITH*"
+    },
+    {
+      "local_name": "KS-BL*"
+    },
+    {
+      "local_name": "KS-F0*"
+    },
+    {
+      "local_name": "KS-H*"
+    },
+    {
+      "local_name": "KS-MC*"
+    },
+    {
+      "local_name": "KS-NACH-*"
+    },
+    {
+      "local_name": "KS-NGCH-*"
+    },
+    {
+      "local_name": "KS-R1*"
+    },
+    {
+      "local_name": "KS-SC-*"
+    },
+    {
+      "local_name": "KS-ST-*"
+    },
+    {
+      "local_name": "KS-X21*"
+    },
+    {
+      "local_name": "WalkingPad"
     }
   ],
   "codeowners": [
