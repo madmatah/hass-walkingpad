@@ -2,7 +2,9 @@
     "name": "ludeeus/integration_blueprint",
     "image": "mcr.microsoft.com/devcontainers/python:3.13",
     "runArgs": [
-        "-v/run/dbus:/run/dbus:ro"
+        "-v/run/dbus:/run/dbus:ro",
+        "--security-opt",
+        "apparmor:unconfined"
     ],
     "postCreateCommand": "scripts/setup",
     "forwardPorts": [
