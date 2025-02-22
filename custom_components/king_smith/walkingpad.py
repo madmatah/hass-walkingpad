@@ -48,7 +48,7 @@ class WalkingPad:
         """Update current state."""
 
         status: WalkingPadStatus = {
-            "belt_state": BeltState(data.belt_state),
+            "belt_state": BeltState(data.belt_state) if data.belt_state in iter(BeltState) else BeltState.UNKNOWN,
             "speed": data.speed / 10,
             "mode": WalkingPadMode(data.manual_mode),
             "session_distance": data.dist * 10,

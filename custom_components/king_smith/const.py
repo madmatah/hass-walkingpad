@@ -1,18 +1,20 @@
 """Constants for the walkingpad integration."""
 
-from enum import Enum, unique
+from enum import Enum, IntEnum, unique
 from typing import TypedDict
 
 DOMAIN = "king_smith"
 
 
 @unique
-class BeltState(Enum):
+class BeltState(IntEnum):
     """An enumeration of the possible belt states."""
 
     STOPPED = 0
     ACTIVE = 1
     STANDBY = 5
+    STARTING = 9
+    UNKNOWN = 1000
 
 
 @unique
