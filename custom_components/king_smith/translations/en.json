@@ -28,5 +28,27 @@
                 "title": "Manual configuration of a Walkingpad"
             }
         }
+    },
+    "entity": {
+        "sensor": {
+            "walkingpad_current_speed": {
+                "name": "Current speed"
+            },
+            "walkingpad_distance": {
+                "name": "Distance"
+            },
+            "walkingpad_duration_minutes": {
+                "name": "Duration (minutes)"
+            },
+            "walkingpad_duration_hours": {
+                "name": "Duration (hours)"
+            },
+            "walkingpad_duration_days": {
+                "name": "Duration (days)"
+            },
+            "walkingpad_steps": {
+                "name": "Steps"
+            }
+        }
     }
 }

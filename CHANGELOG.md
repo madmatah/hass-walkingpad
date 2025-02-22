@@ -10,11 +10,13 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
-- upgrade homeassistant to 2024.3.3
+- add support for more WalkingPad models
+- upgrade homeassistant to 2025.2.5
 
 ### Fixed
 
 - warnings about invalid suggested_unit_of_measurement
+- add missing translations for sensor names
 
 ## [0.1.0] - 2024-03-29
 
