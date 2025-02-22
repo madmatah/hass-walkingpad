@@ -1,8 +1,9 @@
 """The Walking Pad Coordinator."""
+
 import asyncio
+import logging
 from collections.abc import Callable
 from datetime import timedelta
-import logging
 from typing import Any
 
 from homeassistant.core import CALLBACK_TYPE, HassJob, HomeAssistant, callback
