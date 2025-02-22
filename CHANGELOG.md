@@ -17,6 +17,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 - warnings about invalid suggested_unit_of_measurement
 - add missing translations for sensor names
+- handle unknown belt states
 
 ## [0.1.0] - 2024-03-29
 
