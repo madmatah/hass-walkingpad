@@ -49,6 +49,11 @@
             "walkingpad_steps": {
                 "name": "Steps"
             }
+        },
+        "switch": {
+            "walkingpad_belt_switch": {
+                "name": "Belt"
+            }
         }
     }
 }

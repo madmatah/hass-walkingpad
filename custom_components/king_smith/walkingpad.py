@@ -1,7 +1,8 @@
 """Walking Pad Api."""
+
 import asyncio
-from enum import Enum, unique
 import logging
+from enum import Enum, unique
 
 from bleak import BleakError
 from bleak.backends.device import BLEDevice
@@ -129,6 +130,34 @@ class WalkingPad:
             try:
                 await self._controller.ask_stats()
                 # Skip callback so we don't reset debouncer
+            except BleakError as err:
+                _LOGGER.warning("Bluetooth error : %s", err)
+                self._connection_status = WalkingPadConnectionStatus.NOT_CONNECTED
+
+    async def start_belt(self) -> None:
+        """Start the belt."""
+        if self._connection_status == WalkingPadConnectionStatus.NOT_CONNECTED:
+            await self.connect()
+        lock = self._begin_cmd()
+        async with lock:
+            if not self.connected:
+                return
+            try:
+                await self._controller.start_belt()
+            except BleakError as err:
+                _LOGGER.warning("Bluetooth error : %s", err)
+                self._connection_status = WalkingPadConnectionStatus.NOT_CONNECTED
+
+    async def stop_belt(self) -> None:
+        """Start the belt."""
+        if self._connection_status == WalkingPadConnectionStatus.NOT_CONNECTED:
+            await self.connect()
+        lock = self._begin_cmd()
+        async with lock:
+            if not self.connected:
+                return
+            try:
+                await self._controller.stop_belt()
             except BleakError as err:
                 _LOGGER.warning("Bluetooth error : %s", err)
                 self._connection_status = WalkingPadConnectionStatus.NOT_CONNECTED
