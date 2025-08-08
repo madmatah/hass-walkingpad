@@ -13,7 +13,7 @@ from .const import DOMAIN
 from .coordinator import WalkingPadCoordinator
 from .walkingpad import WalkingPad
 
-PLATFORMS: list[Platform] = [Platform.SENSOR]
+PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.SWITCH]
 
 
 class WalkingPadIntegrationData(TypedDict):
@@ -41,7 +41,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 Enable the bluetooth integration or ensure an esphome device \
                 is running as a bluetooth proxy"
             )
-        raise ConfigEntryNotReady(f"Could not find Walkingpad with address {address}")
+        raise ConfigEntryNotReady(
+            f"Could not find Walkingpad with address {address}")
 
     name = entry.data.get(CONF_NAME) or DOMAIN
     walkingpad_device = WalkingPad(name, ble_device)
