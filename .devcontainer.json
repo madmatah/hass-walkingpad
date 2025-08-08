@@ -1,6 +1,6 @@
 {
+    "dockerFile": "./Dockerfile",
     "name": "ludeeus/integration_blueprint",
-    "image": "mcr.microsoft.com/devcontainers/python:3.13",
     "runArgs": [
         "-v/run/dbus:/run/dbus:ro",
         "--security-opt",
@@ -43,7 +43,8 @@
                     "--profile",
                     "black"
                 ],
-                "python.pythonPath": "/usr/bin/python3",
+                "python.defaultInterpreterPath": "/usr/local/bin/python",
+                "python.pythonPath": "/usr/local/bin/python",
                 "python.analysis.autoSearchPaths": false,
                 "python.linting.pylintEnabled": true,
                 "python.linting.enabled": true,
@@ -58,6 +59,19 @@
     },
     "remoteUser": "vscode",
     "features": {
-        "ghcr.io/devcontainers/features/rust:1": {}
+        "ghcr.io/devcontainers/features/rust:1": {},
+        "ghcr.io/devcontainers/features/common-utils:2":{
+            "installZsh": "true",
+            "username": "vscode",
+            "userUid": "1000",
+            "userGid": "1000",
+            "upgradePackages": "true"
+        },
+        "ghcr.io/devcontainers/features/python:1": "none",
+        "ghcr.io/devcontainers/features/node:1": "none",
+        "ghcr.io/devcontainers/features/git:1": {
+            "version": "latest",
+            "ppa": "false"
+        }
     }
 }
