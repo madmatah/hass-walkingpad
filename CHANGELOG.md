@@ -8,6 +8,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.1] - 2025-08-08
+
 ### Changed
 
 - upgrade homeassistant to 2025.8.0
@@ -43,6 +45,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - current speed sensor
 - basic configuration guide in the README
 
-[unreleased]: https://github.com/madmatah/compare/v0.2.0...main
+[unreleased]: https://github.com/madmatah/compare/v0.2.1...main
+[0.2.1]: https://github.com/madmatah/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/madmatah/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/madmatah/hass-walkingpad/compare/eb2749688ebbf334fa29c5004511e8ee8680307f...v0.1.0
