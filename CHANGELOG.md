@@ -8,6 +8,15 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- upgrade homeassistant to 2025.8.0
+- upgrade ph4-walkingpad to 1.0.2
+
+### Fixed
+
+- error when using this integration with latest versions of bleak
+
 ## [0.2.0] - 2025-02-23
 
 ### Changed
