@@ -1,5 +1,5 @@
 colorlog==6.9.0
 homeassistant==2025.8.0
 pip==25.0.1
-ruff==0.9.6
+ruff==0.14.4
 ph4-walkingpad==1.0.2
