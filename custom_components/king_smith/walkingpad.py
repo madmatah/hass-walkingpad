@@ -49,7 +49,11 @@ class WalkingPad:
         """Update current state."""
 
         status: WalkingPadStatus = {
-            "belt_state": BeltState(data.belt_state) if data.belt_state in iter(BeltState) else BeltState.UNKNOWN,
+            "belt_state": (
+                BeltState(data.belt_state)
+                if data.belt_state in iter(BeltState)
+                else BeltState.UNKNOWN
+            ),
             "speed": data.speed / 10,
             "mode": WalkingPadMode(data.manual_mode),
             "session_distance": data.dist * 10,
@@ -158,6 +162,21 @@ class WalkingPad:
                 return
             try:
                 await self._controller.stop_belt()
+            except BleakError as err:
+                _LOGGER.warning("Bluetooth error : %s", err)
+                self._connection_status = WalkingPadConnectionStatus.NOT_CONNECTED
+
+    async def set_speed(self, speed: float) -> None:
+        """Set the belt speed in km/h."""
+        if self._connection_status == WalkingPadConnectionStatus.NOT_CONNECTED:
+            await self.connect()
+        lock = self._begin_cmd()
+        async with lock:
+            if not self.connected:
+                return
+            try:
+                speed_tenths = int(speed * 10)
+                await self._controller.change_speed(speed_tenths)
             except BleakError as err:
                 _LOGGER.warning("Bluetooth error : %s", err)
                 self._connection_status = WalkingPadConnectionStatus.NOT_CONNECTED

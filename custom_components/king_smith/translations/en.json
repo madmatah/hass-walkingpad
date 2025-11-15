@@ -89,6 +89,11 @@
             "walkingpad_belt_switch": {
                 "name": "Belt"
             }
+        },
+        "number": {
+            "walkingpad_speed": {
+                "name": "Speed"
+            }
         }
     }
 }
