@@ -97,6 +97,12 @@
         "switch": {
             "walkingpad_belt_switch": {
                 "name": "Belt"
+            },
+            "walkingpad_belt_switch_manual": {
+                "name": "Belt (manual mode)"
+            },
+            "walkingpad_belt_switch_auto": {
+                "name": "Belt (auto mode)"
             }
         },
         "number": {

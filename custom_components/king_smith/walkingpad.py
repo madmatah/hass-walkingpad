@@ -180,3 +180,17 @@ class WalkingPad:
             except BleakError as err:
                 _LOGGER.warning("Bluetooth error : %s", err)
                 self._connection_status = WalkingPadConnectionStatus.NOT_CONNECTED
+
+    async def switch_mode(self, mode: WalkingPadMode) -> None:
+        """Switch the WalkingPad mode."""
+        if self._connection_status == WalkingPadConnectionStatus.NOT_CONNECTED:
+            await self.connect()
+        lock = self._begin_cmd()
+        async with lock:
+            if not self.connected:
+                return
+            try:
+                await self._controller.switch_mode(mode.value)
+            except BleakError as err:
+                _LOGGER.warning("Bluetooth error : %s", err)
+                self._connection_status = WalkingPadConnectionStatus.NOT_CONNECTED
