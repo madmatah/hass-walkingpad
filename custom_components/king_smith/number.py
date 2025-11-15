@@ -9,7 +9,15 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from . import WalkingPadIntegrationData
-from .const import CONF_MAC, CONF_REMOTE_CONTROL_ENABLED, DOMAIN, BeltState
+from .const import (
+    CONF_MAC,
+    CONF_PREFERRED_MODE,
+    CONF_REMOTE_CONTROL_ENABLED,
+    DEFAULT_PREFERRED_MODE,
+    DOMAIN,
+    BeltState,
+    WalkingPadMode,
+)
 from .coordinator import WalkingPadCoordinator
 
 NUMBER_KEY = "walkingpad_speed"
@@ -20,7 +28,11 @@ async def async_setup_entry(
 ) -> None:
     """Set up the WalkingPad number."""
 
-    if not entry.options.get(CONF_REMOTE_CONTROL_ENABLED, False):
+    remote_control_enabled = entry.options.get(CONF_REMOTE_CONTROL_ENABLED, False)
+    preferred_mode = entry.options.get(CONF_PREFERRED_MODE, DEFAULT_PREFERRED_MODE)
+    manual_mode = WalkingPadMode.MANUAL.name.lower()
+
+    if not (remote_control_enabled and preferred_mode == manual_mode):
         entity_registry = er.async_get(hass)
         mac_address = entry.data.get(CONF_MAC)
         unique_id = f"{mac_address}-{NUMBER_KEY}"
