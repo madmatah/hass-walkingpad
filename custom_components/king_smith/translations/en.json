@@ -83,6 +83,12 @@
             },
             "walkingpad_steps": {
                 "name": "Steps"
+            },
+            "walkingpad_state": {
+                "name": "State"
+            },
+            "walkingpad_mode": {
+                "name": "Mode"
             }
         },
         "switch": {
