@@ -1,4 +1,5 @@
 """WalkingPad sensor support."""
+
 from __future__ import annotations
 
 from collections.abc import Callable
@@ -18,7 +19,7 @@ from homeassistant.helpers.typing import StateType
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from . import WalkingPadIntegrationData
-from .const import DOMAIN, WalkingPadStatus
+from .const import DOMAIN, BeltState, WalkingPadMode, WalkingPadStatus
 from .coordinator import WalkingPadCoordinator
 
 
@@ -91,6 +92,26 @@ SENSORS: tuple[WalkingPadSensorEntityDescription, ...] = (
         suggested_display_precision=1,
         translation_key="walkingpad_current_speed",
         value_fn=lambda status: status.get("speed", 0.0),
+    ),
+    WalkingPadSensorEntityDescription(
+        device_class=SensorDeviceClass.ENUM,
+        icon="mdi:state-machine",
+        key="walkingpad_state",
+        name=None,
+        options=[e.name.lower() for e in BeltState],
+        translation_key="walkingpad_state",
+        value_fn=lambda status: status.get(
+            "belt_state", BeltState.UNKNOWN
+        ).name.lower(),
+    ),
+    WalkingPadSensorEntityDescription(
+        device_class=SensorDeviceClass.ENUM,
+        icon="mdi:cog",
+        key="walkingpad_mode",
+        name=None,
+        options=[e.name.lower() for e in WalkingPadMode],
+        translation_key="walkingpad_mode",
+        value_fn=lambda status: status.get("mode", WalkingPadMode.MANUAL).name.lower(),
     ),
 )
 
