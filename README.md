@@ -10,6 +10,8 @@
 Platform | Description
 -- | --
 `sensor` | WalkingPad usage metrics.
+`switch` | Belt control (requires remote control to be enabled).
+`number` | Speed control in manual mode (requires remote control to be enabled).
 
 ## Installation
 
@@ -69,6 +71,30 @@ If you click on it, it will open the manual configuration form:
 Enter your device MAC address in the "device" field and a friendly name in the "name" field.
 
 See the [FAQ](#my-walkingpad-device-is-not-detected) for more details.
+
+### 3. Remote control
+
+This integration supports remote control of your WalkingPad device, allowing you to start/stop the belt and adjust speed directly from Home Assistant. However, **remote control is disabled by default** for safety reasons, as it can create dangerous situations.
+
+To enable remote control, you can either:
+- Activate it during the initial setup (automatic or manual configuration) by expanding the "Remote control" section in the configuration form
+- Enable it later by going to `Settings > Devices & Services`, selecting your WalkingPad integration, clicking on the three dots menu, and choosing "Configure"
+
+Once enabled, you need to select a preferred mode that determines how the remote control behaves:
+
+#### Manual mode (default)
+
+When manual mode is selected:
+- A **switch entity** is created that directly controls the belt start/stop. Turning the switch on starts the belt, turning it off stops it.
+- A **number entity** is created for speed control, allowing you to set the belt speed between 0.5 and 6.0 km/h (in increments of 0.1 km/h). The speed can only be adjusted when the belt is active or starting.
+
+#### Auto mode
+
+When auto mode is selected:
+- A **switch entity** is created that controls the WalkingPad mode switching. Turning the switch on switches the device to AUTO mode (the belt will start automatically when motion is detected), turning it off switches it to STANDBY mode.
+- No speed control is available in auto mode, as the WalkingPad automatically adjusts the speed based on detected motion.
+
+**Important safety note**: Always ensure the WalkingPad area is clear before using remote control features. Use these features at your own risk.
 
 <!---->
 
