@@ -18,7 +18,8 @@
                         "name": "Remote control",
                         "description": "Remote control of your WalkingPad can create dangerous situations for you or your environment. Only activate this option if you know what you are doing. Use it at your own risk.",
                         "data": {
-                            "remote_control_enabled": "Enable remote control"
+                            "remote_control_enabled": "Enable remote control",
+                            "preferred_mode": "Preferred mode"
                         }
                     }
                 },
@@ -38,7 +39,8 @@
                         "name": "Remote control",
                         "description": "Remote control of your WalkingPad can create dangerous situations for you or your environment. Only activate this option if you know what you are doing. Use it at your own risk.",
                         "data": {
-                            "remote_control_enabled": "Enable remote control"
+                            "remote_control_enabled": "Enable remote control",
+                            "preferred_mode": "Preferred mode"
                         }
                     }
                 },
@@ -57,7 +59,8 @@
                         "name": "Remote control",
                         "description": "Remote control of your WalkingPad can create dangerous situations for you or your environment. Only activate this option if you know what you are doing. Use it at your own risk.",
                         "data": {
-                            "remote_control_enabled": "Enable remote control"
+                            "remote_control_enabled": "Enable remote control",
+                            "preferred_mode": "Preferred mode"
                         }
                     }
                 }

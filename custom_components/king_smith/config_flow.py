@@ -16,9 +16,12 @@ from homeassistant.helpers import device_registry as dr
 from .const import (
     CONF_MAC,
     CONF_NAME,
+    CONF_PREFERRED_MODE,
     CONF_REMOTE_CONTROL,
     CONF_REMOTE_CONTROL_ENABLED,
+    DEFAULT_PREFERRED_MODE,
     DOMAIN,
+    PREFERRED_MODE_OPTIONS,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -31,6 +34,10 @@ BASE_SCHEMA = {
                 vol.Required(
                     CONF_REMOTE_CONTROL_ENABLED, "Enable remote control"
                 ): bool,
+                vol.Required(
+                    CONF_PREFERRED_MODE,
+                    default=DEFAULT_PREFERRED_MODE,
+                ): vol.In(PREFERRED_MODE_OPTIONS),
             }
         ),
         {"collapsed": True},
@@ -97,11 +104,17 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 remote_control_enabled = remote_control_data.get(
                     CONF_REMOTE_CONTROL_ENABLED, False
                 )
+                preferred_mode = remote_control_data.get(
+                    CONF_PREFERRED_MODE, DEFAULT_PREFERRED_MODE
+                )
 
                 return self.async_create_entry(
                     title=info[CONF_NAME],
                     data=info,
-                    options={CONF_REMOTE_CONTROL_ENABLED: remote_control_enabled},
+                    options={
+                        CONF_REMOTE_CONTROL_ENABLED: remote_control_enabled,
+                        CONF_PREFERRED_MODE: preferred_mode,
+                    },
                 )
 
         return self.async_show_form(
@@ -146,6 +159,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         remote_control_enabled = remote_control_data.get(
             CONF_REMOTE_CONTROL_ENABLED, False
         )
+        preferred_mode = remote_control_data.get(
+            CONF_PREFERRED_MODE, DEFAULT_PREFERRED_MODE
+        )
 
         entry_data = {
             CONF_MAC: user_input[CONF_MAC],
@@ -155,7 +171,10 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_create_entry(
             title=user_input[CONF_NAME],
             data=entry_data,
-            options={CONF_REMOTE_CONTROL_ENABLED: remote_control_enabled},
+            options={
+                CONF_REMOTE_CONTROL_ENABLED: remote_control_enabled,
+                CONF_PREFERRED_MODE: preferred_mode,
+            },
         )
 
 
@@ -175,12 +194,23 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             remote_control_enabled = remote_control_data.get(
                 CONF_REMOTE_CONTROL_ENABLED, False
             )
+            preferred_mode = remote_control_data.get(
+                CONF_PREFERRED_MODE, DEFAULT_PREFERRED_MODE
+            )
+
             return self.async_create_entry(
-                title="", data={CONF_REMOTE_CONTROL_ENABLED: remote_control_enabled}
+                title="",
+                data={
+                    CONF_REMOTE_CONTROL_ENABLED: remote_control_enabled,
+                    CONF_PREFERRED_MODE: preferred_mode,
+                },
             )
 
         remote_control_enabled = self.config_entry.options.get(
             CONF_REMOTE_CONTROL_ENABLED, False
+        )
+        preferred_mode = self.config_entry.options.get(
+            CONF_PREFERRED_MODE, DEFAULT_PREFERRED_MODE
         )
 
         return self.async_show_form(
@@ -194,6 +224,10 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                                     CONF_REMOTE_CONTROL_ENABLED,
                                     default=remote_control_enabled,
                                 ): bool,
+                                vol.Required(
+                                    CONF_PREFERRED_MODE,
+                                    default=preferred_mode,
+                                ): vol.In(PREFERRED_MODE_OPTIONS),
                             }
                         ),
                         {"collapsed": True},
