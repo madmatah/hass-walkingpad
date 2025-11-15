@@ -11,6 +11,7 @@ CONF_REMOTE_CONTROL_ENABLED: Final = "remote_control_enabled"
 CONF_MAC: Final = "mac"
 CONF_MODE: Final = "mode"
 CONF_NAME: Final = "name"
+CONF_PREFERRED_MODE: Final = "preferred_mode"
 
 
 @unique
@@ -31,6 +32,13 @@ class WalkingPadMode(Enum):
     AUTO = 0
     MANUAL = 1
     STANDBY = 2
+
+
+DEFAULT_PREFERRED_MODE: Final = WalkingPadMode.MANUAL.name.lower()
+PREFERRED_MODE_OPTIONS: Final = [
+    WalkingPadMode.AUTO.name.lower(),
+    WalkingPadMode.MANUAL.name.lower(),
+]
 
 
 class WalkingPadStatus(TypedDict):
