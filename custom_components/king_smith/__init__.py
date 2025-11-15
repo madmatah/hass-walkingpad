@@ -1,15 +1,17 @@
 """The walkingpad integration."""
+
 from __future__ import annotations
 
+import logging
 from typing import TypedDict
 
 from homeassistant.components import bluetooth
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_MAC, CONF_NAME, Platform
+from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 
-from .const import DOMAIN
+from .const import CONF_MAC, CONF_NAME, DOMAIN
 from .coordinator import WalkingPadCoordinator
 from .walkingpad import WalkingPad
 
@@ -21,6 +23,15 @@ class WalkingPadIntegrationData(TypedDict):
 
     device: WalkingPad
     coordinator: WalkingPadCoordinator
+
+
+_LOGGER = logging.getLogger(__name__)
+
+
+async def async_update_options(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Update options and reload platforms."""
+    await hass.config_entries.async_unload_platforms(entry, [Platform.SWITCH])
+    await hass.config_entries.async_forward_entry_setups(entry, [Platform.SWITCH])
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -41,8 +52,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 Enable the bluetooth integration or ensure an esphome device \
                 is running as a bluetooth proxy"
             )
-        raise ConfigEntryNotReady(
-            f"Could not find Walkingpad with address {address}")
+        raise ConfigEntryNotReady(f"Could not find Walkingpad with address {address}")
 
     name = entry.data.get(CONF_NAME) or DOMAIN
     walkingpad_device = WalkingPad(name, ble_device)
@@ -55,6 +65,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data[DOMAIN][entry.entry_id] = integration_data
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+
+    entry.async_on_unload(entry.add_update_listener(async_update_options))
 
     return True
 

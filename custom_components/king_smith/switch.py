@@ -9,17 +9,30 @@ from homeassistant.components.switch import (
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import WalkingPadIntegrationData
-from .const import DOMAIN, BeltState
+from .const import CONF_MAC, CONF_REMOTE_CONTROL_ENABLED, DOMAIN, BeltState
 from .coordinator import STATUS_UPDATE_INTERVAL, WalkingPadCoordinator
+
+SWITCH_KEY = "walkingpad_belt_switch"
 
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     """Set up the WalkingPad switch."""
+
+    if not entry.options.get(CONF_REMOTE_CONTROL_ENABLED, False):
+        entity_registry = er.async_get(hass)
+        mac_address = entry.data.get(CONF_MAC)
+        unique_id = f"{mac_address}-{SWITCH_KEY}"
+
+        entity_id = entity_registry.async_get_entity_id("switch", DOMAIN, unique_id)
+        if entity_id:
+            entity_registry.async_remove(entity_id)
+        return
 
     entry_data: WalkingPadIntegrationData = hass.data[DOMAIN][entry.entry_id]
     coordinator = entry_data["coordinator"]
@@ -45,7 +58,7 @@ class WalkingPadBeltSwitchEntity(SwitchEntity):
         self.entity_description = SwitchEntityDescription(
             device_class=SwitchDeviceClass.SWITCH,
             icon="mdi:cog-play",
-            key="walkingpad_belt_switch",
+            key=SWITCH_KEY,
             translation_key="walkingpad_belt_switch",
             has_entity_name=True,
         )
@@ -88,9 +101,9 @@ class WalkingPadBeltSwitchEntity(SwitchEntity):
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn the switch on."""
         self.set_temporary_state(BeltState.STARTING)
-        await self.coordinator.walkingpad_device.start_belt(),
+        await self.coordinator.walkingpad_device.start_belt()
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn the switch off."""
         self.set_temporary_state(BeltState.STOPPED)
-        await self.coordinator.walkingpad_device.stop_belt(),
+        await self.coordinator.walkingpad_device.stop_belt()
