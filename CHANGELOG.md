@@ -8,6 +8,13 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- remote control configuration options
+- new sensors (walkingpad_state and walkingpad_mode)
+- belt control switch
+- speed control
+
 ## [0.2.1] - 2025-08-08
 
 ### Changed
