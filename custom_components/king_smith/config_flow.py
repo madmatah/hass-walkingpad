@@ -1,29 +1,48 @@
 """Config flow for walkingpad integration."""
+
 from __future__ import annotations
 
 import logging
 from typing import Any
 
 import voluptuous as vol
-
 from homeassistant import config_entries
 from homeassistant.components import bluetooth
-from homeassistant.const import CONF_MAC, CONF_NAME
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResult
+from homeassistant.core import HomeAssistant, callback
+from homeassistant.data_entry_flow import FlowResult, section
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import device_registry as dr
 
-from .const import DOMAIN
+from .const import (
+    CONF_MAC,
+    CONF_NAME,
+    CONF_REMOTE_CONTROL,
+    CONF_REMOTE_CONTROL_ENABLED,
+    DOMAIN,
+)
 
 _LOGGER = logging.getLogger(__name__)
+
+BASE_SCHEMA = {
+    vol.Required(CONF_NAME, "Device name"): str,
+    vol.Required(CONF_REMOTE_CONTROL): section(
+        vol.Schema(
+            {
+                vol.Required(
+                    CONF_REMOTE_CONTROL_ENABLED, "Enable remote control"
+                ): bool,
+            }
+        ),
+        {"collapsed": True},
+    ),
+}
+
 
 STEP_USER_DATA_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_MAC, "MAC Address"): str,
-        vol.Required(CONF_NAME, "Device name"): str,
     }
-)
+).extend(BASE_SCHEMA)
 
 
 async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str, Any]:
@@ -37,8 +56,10 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
     if ble_device is None:
         raise CannotConnect
 
-    # Return info that you want to store in the config entry.
-    return {CONF_MAC: ble_device.address, CONF_NAME: data[CONF_NAME]}
+    return {
+        CONF_MAC: ble_device.address,
+        CONF_NAME: data[CONF_NAME],
+    }
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -46,6 +67,14 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     VERSION = 1
     CONNECTION_CLASS = config_entries.CONN_CLASS_LOCAL_POLL
+
+    @staticmethod
+    @callback
+    def async_get_options_flow(
+        config_entry: config_entries.ConfigEntry,
+    ) -> OptionsFlowHandler:
+        """Return the options flow handler."""
+        return OptionsFlowHandler(config_entry)
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
@@ -63,7 +92,17 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             else:
                 await self.async_set_unique_id(dr.format_mac(info[CONF_MAC]))
                 self._abort_if_unique_id_configured()
-                return self.async_create_entry(title=info[CONF_NAME], data=info)
+
+                remote_control_data = user_input.get(CONF_REMOTE_CONTROL, {})
+                remote_control_enabled = remote_control_data.get(
+                    CONF_REMOTE_CONTROL_ENABLED, False
+                )
+
+                return self.async_create_entry(
+                    title=info[CONF_NAME],
+                    data=info,
+                    options={CONF_REMOTE_CONTROL_ENABLED: remote_control_enabled},
+                )
 
         return self.async_show_form(
             step_id="user", data_schema=STEP_USER_DATA_SCHEMA, errors=errors
@@ -95,21 +134,73 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             schema = vol.Schema(
                 {
                     vol.Required(CONF_MAC): schema_mac,
-                    vol.Required(
-                        CONF_NAME,
-                        default=dev_name,
-                        msg="Name",
-                        description="Device name",
-                    ): str,
                 }
-            )
+            ).extend(BASE_SCHEMA)
             return self.async_show_form(step_id="device", data_schema=schema)
 
         user_input[CONF_MAC] = self.discovered_device["address"]
         await self.async_set_unique_id(self.discovered_device["address"])
         self._abort_if_unique_id_configured()
 
-        return self.async_create_entry(title=user_input[CONF_NAME], data=user_input)
+        remote_control_data = user_input.get(CONF_REMOTE_CONTROL, {})
+        remote_control_enabled = remote_control_data.get(
+            CONF_REMOTE_CONTROL_ENABLED, False
+        )
+
+        entry_data = {
+            CONF_MAC: user_input[CONF_MAC],
+            CONF_NAME: user_input[CONF_NAME],
+        }
+
+        return self.async_create_entry(
+            title=user_input[CONF_NAME],
+            data=entry_data,
+            options={CONF_REMOTE_CONTROL_ENABLED: remote_control_enabled},
+        )
+
+
+class OptionsFlowHandler(config_entries.OptionsFlow):
+    """Handle an options flow for walkingpad."""
+
+    def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
+        """Initialize options flow."""
+        self.config_entry = config_entry
+
+    async def async_step_init(
+        self, user_input: dict[str, Any] | None = None
+    ) -> FlowResult:
+        """Manage the options."""
+        if user_input is not None:
+            remote_control_data = user_input.get(CONF_REMOTE_CONTROL, {})
+            remote_control_enabled = remote_control_data.get(
+                CONF_REMOTE_CONTROL_ENABLED, False
+            )
+            return self.async_create_entry(
+                title="", data={CONF_REMOTE_CONTROL_ENABLED: remote_control_enabled}
+            )
+
+        remote_control_enabled = self.config_entry.options.get(
+            CONF_REMOTE_CONTROL_ENABLED, False
+        )
+
+        return self.async_show_form(
+            step_id="init",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(CONF_REMOTE_CONTROL): section(
+                        vol.Schema(
+                            {
+                                vol.Required(
+                                    CONF_REMOTE_CONTROL_ENABLED,
+                                    default=remote_control_enabled,
+                                ): bool,
+                            }
+                        ),
+                        {"collapsed": True},
+                    ),
+                }
+            ),
+        )
 
 
 class CannotConnect(HomeAssistantError):

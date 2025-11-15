@@ -13,6 +13,15 @@
                     "mac": "Device",
                     "name": "Name"
                 },
+                "sections": {
+                    "remote_control": {
+                        "name": "Remote control",
+                        "description": "Remote control of your WalkingPad can create dangerous situations for you or your environment. Only activate this option if you know what you are doing. Use it at your own risk.",
+                        "data": {
+                            "remote_control_enabled": "Enable remote control"
+                        }
+                    }
+                },
                 "description": "Congrats! Your WalkingPad has been automatically discovered. Please give it a friendly name for Home Assistant.",
                 "title": "Walkingpad"
             },
@@ -24,8 +33,34 @@
                 "data_description": {
                     "mac": "The MAC address of your Walkingpad."
                 },
+                "sections": {
+                    "remote_control": {
+                        "name": "Remote control",
+                        "description": "Remote control of your WalkingPad can create dangerous situations for you or your environment. Only activate this option if you know what you are doing. Use it at your own risk.",
+                        "data": {
+                            "remote_control_enabled": "Enable remote control"
+                        }
+                    }
+                },
                 "description": "If your Walkingpad is ON, it should be automatically discovered by Home Assistant. Use manual configuration only if you know what you are doing.",
                 "title": "Manual configuration of a Walkingpad"
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "WalkingPad Options",
+                "description": "Configure remote control settings for your WalkingPad.",
+                "sections": {
+                    "remote_control": {
+                        "name": "Remote control",
+                        "description": "Remote control of your WalkingPad can create dangerous situations for you or your environment. Only activate this option if you know what you are doing. Use it at your own risk.",
+                        "data": {
+                            "remote_control_enabled": "Enable remote control"
+                        }
+                    }
+                }
             }
         }
     },

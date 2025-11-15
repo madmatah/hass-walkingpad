@@ -1,9 +1,16 @@
 """Constants for the walkingpad integration."""
 
 from enum import Enum, IntEnum, unique
-from typing import TypedDict
+from typing import Final, TypedDict
 
 DOMAIN = "king_smith"
+
+
+CONF_REMOTE_CONTROL: Final = "remote_control"
+CONF_REMOTE_CONTROL_ENABLED: Final = "remote_control_enabled"
+CONF_MAC: Final = "mac"
+CONF_MODE: Final = "mode"
+CONF_NAME: Final = "name"
 
 
 @unique
