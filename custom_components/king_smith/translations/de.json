@@ -1,0 +1,114 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Dieses Geraet ist bereits konfiguriert"
+        },
+        "error": {
+            "cannot_connect": "Verbindung fehlgeschlagen",
+            "unknown": "Unerwarteter Fehler"
+        },
+        "step": {
+            "device": {
+                "data": {
+                    "mac": "Geraet",
+                    "name": "Name"
+                },
+                "sections": {
+                    "remote_control": {
+                        "name": "Fernsteuerung",
+                        "description": "Die Fernsteuerung deines WalkingPads kann gefaehrliche Situationen fuer dich oder deine Umgebung schaffen. Aktiviere diese Option nur, wenn du weisst, was du tust. Benutzung auf eigene Gefahr.",
+                        "data": {
+                            "remote_control_enabled": "Fernsteuerung aktivieren",
+                            "preferred_mode": "Bevorzugter Modus"
+                        }
+                    }
+                },
+                "description": "Dein WalkingPad wurde automatisch erkannt. Bitte gib ihm einen Namen fuer Home Assistant.",
+                "title": "Walkingpad"
+            },
+            "user": {
+                "data": {
+                    "mac": "Geraet",
+                    "name": "Name"
+                },
+                "data_description": {
+                    "mac": "Die MAC-Adresse deines Walkingpads."
+                },
+                "sections": {
+                    "remote_control": {
+                        "name": "Fernsteuerung",
+                        "description": "Die Fernsteuerung deines WalkingPads kann gefaehrliche Situationen fuer dich oder deine Umgebung schaffen. Aktiviere diese Option nur, wenn du weisst, was du tust. Benutzung auf eigene Gefahr.",
+                        "data": {
+                            "remote_control_enabled": "Fernsteuerung aktivieren",
+                            "preferred_mode": "Bevorzugter Modus"
+                        }
+                    }
+                },
+                "description": "Wenn dein Walkingpad eingeschaltet ist, sollte es automatisch von Home Assistant erkannt werden. Verwende die manuelle Konfiguration nur, wenn du weisst, was du tust.",
+                "title": "Manuelle Konfiguration eines Walkingpads"
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "WalkingPad-Optionen",
+                "description": "Fernsteuerungseinstellungen fuer dein WalkingPad konfigurieren.",
+                "sections": {
+                    "remote_control": {
+                        "name": "Fernsteuerung",
+                        "description": "Die Fernsteuerung deines WalkingPads kann gefaehrliche Situationen fuer dich oder deine Umgebung schaffen. Aktiviere diese Option nur, wenn du weisst, was du tust. Benutzung auf eigene Gefahr.",
+                        "data": {
+                            "remote_control_enabled": "Fernsteuerung aktivieren",
+                            "preferred_mode": "Bevorzugter Modus"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "entity": {
+        "sensor": {
+            "walkingpad_current_speed": {
+                "name": "Aktuelle Geschwindigkeit"
+            },
+            "walkingpad_distance": {
+                "name": "Distanz"
+            },
+            "walkingpad_duration": {
+                "name": "Dauer"
+            },
+            "walkingpad_steps": {
+                "name": "Schritte"
+            },
+            "walkingpad_calories": {
+                "name": "Kalorien"
+            },
+            "walkingpad_state": {
+                "name": "Zustand"
+            },
+            "walkingpad_mode": {
+                "name": "Modus"
+            }
+        },
+        "switch": {
+            "walkingpad_belt_switch": {
+                "name": "Laufband"
+            },
+            "walkingpad_belt_switch_manual": {
+                "name": "Laufband (manueller Modus)"
+            },
+            "walkingpad_belt_switch_auto": {
+                "name": "Laufband (Auto-Modus)"
+            },
+            "walkingpad_stay_connected": {
+                "name": "Verbunden bleiben"
+            }
+        },
+        "number": {
+            "walkingpad_speed": {
+                "name": "Geschwindigkeit"
+            }
+        }
+    }
+}

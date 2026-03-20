@@ -75,17 +75,14 @@
             "walkingpad_distance": {
                 "name": "Distance"
             },
-            "walkingpad_duration_minutes": {
-                "name": "Duration (minutes)"
-            },
-            "walkingpad_duration_hours": {
-                "name": "Duration (hours)"
-            },
-            "walkingpad_duration_days": {
-                "name": "Duration (days)"
+            "walkingpad_duration": {
+                "name": "Duration"
             },
             "walkingpad_steps": {
                 "name": "Steps"
+            },
+            "walkingpad_calories": {
+                "name": "Calories"
             },
             "walkingpad_state": {
                 "name": "State"
@@ -103,6 +100,9 @@
             },
             "walkingpad_belt_switch_auto": {
                 "name": "Belt (auto mode)"
+            },
+            "walkingpad_stay_connected": {
+                "name": "Stay connected"
             }
         },
         "number": {

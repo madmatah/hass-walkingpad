@@ -4,13 +4,16 @@
 [![GitHub Activity][commits-shield]][commits]
 [![License][license-shield]](LICENSE)
 
+Home Assistant custom integration for KingSmith WalkingPad treadmills. Supports both the standard **FTMS** (Fitness Machine Service) BLE protocol and the legacy **WiLink** protocol.
+
+> This is a fork of [madmatah/hass-walkingpad](https://github.com/madmatah/hass-walkingpad) that adds FTMS protocol support via the [walkingpad-controller](https://github.com/mcdax/walkingpad-controller) library.
 
 **This integration will set up the following platforms.**
 
 Platform | Description
 -- | --
-`sensor` | WalkingPad usage metrics.
-`switch` | Belt control (requires remote control to be enabled).
+`sensor` | WalkingPad usage metrics (speed, distance, duration, steps, calories).
+`switch` | Belt control and stay-connected toggle (requires remote control to be enabled).
 `number` | Speed control in manual mode (requires remote control to be enabled).
 
 ## Installation
@@ -19,7 +22,7 @@ Platform | Description
 1. Open the HACS dashboard then click `Integrations`,
 1. Click the `3 dots menu` on the top right corner
 1. Click `Custom repository`
-1. Enter the repo url `https://github.com/madmatah/hass-walkingpad`
+1. Enter the repo url `https://github.com/mcdax/hass-walkingpad`
 1. Chose a the `Integration` category then **Submit**
 1. Click on the new `Kingsmith WalkingPad` repo
 1. Click on `Download` on the bottom right corner.
@@ -53,8 +56,6 @@ In this case, you will see a new discovered device in `Settings > Devices & Se
 Just click and configure and enter a friendly name for your device:
 
 ![Automatic config flow](./assets/images/bluetooth-config-flow.png)
-
-
 That's it!
 
 If your device is not detected, read the [FAQ](#my-walkingpad-device-is-not-detected) and try to use the Manual configuration mode.
@@ -66,8 +67,6 @@ In `Settings > Devices & Services`, click on `Add integration` and look for `Kin
 If you click on it, it will open the manual configuration form:
 
 ![Manual configuration](./assets/images/manual-config-flow.png)
-
-
 Enter your device MAC address in the "device" field and a friendly name in the "name" field.
 
 See the [FAQ](#my-walkingpad-device-is-not-detected) for more details.
@@ -96,7 +95,42 @@ When auto mode is selected:
 
 **Important safety note**: Always ensure the WalkingPad area is clear before using remote control features. Use these features at your own risk.
 
+### 4. Stay Connected switch
+
+When remote control is enabled, a **Stay Connected** switch entity is also created. This controls whether the BLE connection to the treadmill is kept open:
+
+- **ON** (connected): The integration maintains a BLE connection for real-time sensor updates. Required for remote control commands.
+- **OFF** (disconnected): The BLE connection is released. Sensors show stale data. Other Bluetooth clients (e.g. KS Fit app) can connect.
+
+**Auto-toggle behavior:** The integration automatically turns Stay Connected ON when you start the belt from Home Assistant, and OFF when the belt fully stops (after a deferred disconnect that waits for the belt to decelerate).
+
 <!---->
+
+## Supported protocols
+
+This integration supports two BLE communication protocols:
+
+### WiLink (legacy)
+
+The original protocol used by most KingSmith/WalkingPad devices, based on the `ph4-walkingpad` library. Communicates over BLE service `0xFE00`. This is the default for all devices except those matched below.
+
+### FTMS (Fitness Machine Service)
+
+Newer KingSmith treadmills (BLE name matching `KS-HD-*`) use the standard Bluetooth FTMS protocol (service `0x1826`) instead of the proprietary WiLink protocol. The integration auto-detects which protocol to use based on the device's BLE advertisement name.
+
+**FTMS-specific details:**
+- Speed range and increment are read from the device at connection time (e.g. 1.0-6.0 km/h in 0.1 km/h steps for the KS-Z1D)
+- Sensors: instantaneous speed, total distance, step count, elapsed time
+- Cold start requires the FTMS Start/Resume command before speed can be set
+- The integration handles BLE connection drops during cold start with automatic speed recovery on reconnect
+
+**Verified devices:**
+
+Device | BLE Name | Protocol
+-- | -- | --
+KS-Z1D | KS-HD-Z1D | FTMS
+
+If you have a KingSmith device that uses FTMS (or doesn't work with the legacy protocol), please open an issue with your device model and BLE name.
 
 ## FAQ
 
@@ -162,25 +196,24 @@ You need to have Bluez >= 5.63 installed on your host system.
 
 It should be OK in most case, but if your DBus socket is not
 in `/run/dbus`, you might have to tweak the .devcontainer.json (see `runArgs`).
-
-
 #### 4. Profit
 
 Then, you can run the devcontainer and start Home Assistant with `scripts/develop`.
 
 You might have a TLS error on the first run in the logs. Just restart the command and everything should be fine, your bluetooth adapter should be detected by Home Assistant.
 
-
 ## Acknowledgements
 
-This project uses [ph4-walkingpad](https://github.com/ph4r05/ph4-walkingpad) library to control the WalkingPad device. Thanks [@ph4r05](https://github.com/ph4r05)!
+This project is a fork of [madmatah/hass-walkingpad](https://github.com/madmatah/hass-walkingpad), which uses [ph4-walkingpad](https://github.com/ph4r05/ph4-walkingpad) for legacy WiLink protocol support. Thanks [@madmatah](https://github.com/madmatah) and [@ph4r05](https://github.com/ph4r05)!
 
 This project takes inspiration and code from [@indiefan](https://github.com/indiefan)'s [king smith](https://github.com/indiefan/king_smith) custom integration.
 
+FTMS protocol support is provided by the [walkingpad-controller](https://github.com/mcdax/walkingpad-controller) library.
+
 ***
 
-[commits-shield]: https://img.shields.io/github/commit-activity/y/madmatah/hass-walkingpad.svg?style=for-the-badge
-[commits]: https://github.com/madmatah/hass-walkingpad/commits/main
-[license-shield]: https://img.shields.io/github/license/madmatah/hass-walkingpad.svg?style=for-the-badge
-[releases-shield]: https://img.shields.io/github/release/madmatah/hass-walkingpad.svg?style=for-the-badge
-[releases]: https://github.com/madmatah/hass-walkingpad/releases
+[commits-shield]: https://img.shields.io/github/commit-activity/y/mcdax/hass-walkingpad.svg?style=for-the-badge
+[commits]: https://github.com/mcdax/hass-walkingpad/commits/main
+[license-shield]: https://img.shields.io/github/license/mcdax/hass-walkingpad.svg?style=for-the-badge
+[releases-shield]: https://img.shields.io/github/release/mcdax/hass-walkingpad.svg?style=for-the-badge
+[releases]: https://github.com/mcdax/hass-walkingpad/releases

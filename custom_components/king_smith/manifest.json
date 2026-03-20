@@ -39,24 +39,29 @@
       "local_name": "KS-X21*"
     },
     {
+      "local_name": "KS-HD-*"
+    },
+    {
       "local_name": "WalkingPad"
     }
   ],
   "codeowners": [
-    "@madmatah"
+    "@madmatah",
+    "@mcdax"
   ],
   "config_flow": true,
   "dependencies": [
     "bluetooth_adapters"
   ],
-  "documentation": "https://github.com/madmatah/hass-walkingpad",
+  "documentation": "https://github.com/mcdax/hass-walkingpad",
   "integration_type": "device",
   "iot_class": "local_polling",
-  "issue_tracker": "https://github.com/madmatah/hass-walkingpad/issues",
+  "issue_tracker": "https://github.com/mcdax/hass-walkingpad/issues",
   "requirements": [
+    "walkingpad-controller>=0.4.0",
     "ph4-walkingpad==1.0.2"
   ],
   "ssdp": [],
-  "version": "0.3.0",
+  "version": "0.4.0",
   "zeroconf": []
 }

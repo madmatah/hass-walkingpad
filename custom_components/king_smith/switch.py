@@ -1,6 +1,6 @@
 """Walkingpad switch support."""
 
-import asyncio
+import logging
 from abc import ABC
 from typing import Any
 
@@ -10,9 +10,11 @@ from homeassistant.components.switch import (
     SwitchEntityDescription,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.restore_state import RestoreEntity
 
 from . import WalkingPadIntegrationData
 from .const import (
@@ -27,15 +29,35 @@ from .const import (
 from .coordinator import STATUS_UPDATE_INTERVAL, WalkingPadCoordinator
 from .utils import TemporaryValue
 
+_LOGGER = logging.getLogger(__name__)
+
 SWITCH_KEY = "walkingpad_belt_switch"
+STAY_CONNECTED_KEY = "walkingpad_stay_connected"
 
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     """Set up the WalkingPad switch."""
+    entry_data: WalkingPadIntegrationData = hass.data[DOMAIN][entry.entry_id]
+    coordinator = entry_data["coordinator"]
 
-    if not entry.options.get(CONF_REMOTE_CONTROL_ENABLED, False):
+    entities: list[SwitchEntity] = []
+
+    # Stay Connected switch is always created (not gated by remote_control)
+    entities.append(WalkingPadStayConnectedSwitch(coordinator))
+
+    # Belt control switches are gated by remote_control_enabled
+    if entry.options.get(CONF_REMOTE_CONTROL_ENABLED, False):
+        preferred_mode = entry.options.get(CONF_PREFERRED_MODE, DEFAULT_PREFERRED_MODE)
+        manual_mode = WalkingPadMode.MANUAL.name.lower()
+
+        if preferred_mode == manual_mode:
+            entities.append(WalkingPadBeltSwitchManual(coordinator))
+        else:
+            entities.append(WalkingPadBeltSwitchAuto(coordinator))
+    else:
+        # Clean up belt switch entity if remote_control was disabled
         entity_registry = er.async_get(hass)
         mac_address = entry.data.get(CONF_MAC)
         unique_id = f"{mac_address}-{SWITCH_KEY}"
@@ -43,18 +65,8 @@ async def async_setup_entry(
         entity_id = entity_registry.async_get_entity_id("switch", DOMAIN, unique_id)
         if entity_id:
             entity_registry.async_remove(entity_id)
-        return
 
-    entry_data: WalkingPadIntegrationData = hass.data[DOMAIN][entry.entry_id]
-    coordinator = entry_data["coordinator"]
-
-    preferred_mode = entry.options.get(CONF_PREFERRED_MODE, DEFAULT_PREFERRED_MODE)
-    manual_mode = WalkingPadMode.MANUAL.name.lower()
-
-    if preferred_mode == manual_mode:
-        async_add_entities([WalkingPadBeltSwitchManual(coordinator)])
-    else:
-        async_add_entities([WalkingPadBeltSwitchAuto(coordinator)])
+    async_add_entities(entities)
 
 
 class WalkingPadBeltSwitchBase(SwitchEntity, ABC):
@@ -86,6 +98,11 @@ class WalkingPadBeltSwitchBase(SwitchEntity, ABC):
         )
         self._attr_unique_id = (
             f"{coordinator.walkingpad_device.mac}-{self.entity_description.key}"
+        )
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, coordinator.walkingpad_device.mac)},
+            name=coordinator.walkingpad_device.name,
+            manufacturer="KingSmith",
         )
         super().__init__()
 
@@ -149,18 +166,22 @@ class WalkingPadBeltSwitchManual(WalkingPadBeltSwitchBase):
 
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn the switch on."""
-        current_mode = self.coordinator.data.get("mode")
-        if current_mode != WalkingPadMode.MANUAL:
-            await self.coordinator.walkingpad_device.switch_mode(WalkingPadMode.MANUAL)
-            await asyncio.sleep(1.5)
         self.set_temporary_mode(WalkingPadMode.MANUAL)
         self.set_temporary_belt_state(BeltState.STARTING)
-        await self.coordinator.walkingpad_device.start_belt()
+        await self.coordinator.async_set_stay_connected(True)
+        current_mode = self.coordinator.data.get("mode")
+        if current_mode != WalkingPadMode.MANUAL:
+            await self.coordinator.walkingpad_device.start_belt_in_mode(
+                WalkingPadMode.MANUAL
+            )
+        else:
+            await self.coordinator.walkingpad_device.start_belt()
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn the switch off."""
         self.set_temporary_belt_state(BeltState.STOPPED)
         await self.coordinator.walkingpad_device.stop_belt()
+        self.coordinator.async_schedule_deferred_disconnect()
 
 
 class WalkingPadBeltSwitchAuto(WalkingPadBeltSwitchBase):
@@ -196,6 +217,7 @@ class WalkingPadBeltSwitchAuto(WalkingPadBeltSwitchBase):
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn the switch on."""
         self.set_temporary_mode(WalkingPadMode.AUTO)
+        await self.coordinator.async_set_stay_connected(True)
         await self.coordinator.walkingpad_device.switch_mode(WalkingPadMode.AUTO)
 
     async def async_turn_off(self, **kwargs: Any) -> None:
@@ -203,3 +225,83 @@ class WalkingPadBeltSwitchAuto(WalkingPadBeltSwitchBase):
         self.set_temporary_mode(WalkingPadMode.STANDBY)
         self.set_temporary_belt_state(BeltState.STOPPED)
         await self.coordinator.walkingpad_device.switch_mode(WalkingPadMode.STANDBY)
+        self.coordinator.async_schedule_deferred_disconnect()
+
+
+class WalkingPadStayConnectedSwitch(SwitchEntity, RestoreEntity):
+    """Switch to control whether HA maintains a persistent BLE connection.
+
+    When ON (default): HA stays connected, coordinator polls every 5s, sensors
+    update live.  This is the normal behavior.
+
+    When OFF: HA disconnects immediately, freeing the BLE link so the user's
+    smartphone app (e.g. KS Fit) can connect for tracking.  Commands (belt
+    on/off, speed) will still work — they connect, send the command, then
+    disconnect right away.  Sensors go stale until stay_connected is re-enabled.
+
+    State is persisted across HA restarts via RestoreEntity.
+    """
+
+    entity_description: SwitchEntityDescription
+
+    def __init__(self, coordinator: WalkingPadCoordinator) -> None:
+        """Initialize the stay connected switch."""
+        self.coordinator = coordinator
+        self.entity_description = SwitchEntityDescription(
+            device_class=SwitchDeviceClass.SWITCH,
+            icon="mdi:bluetooth-connect",
+            key=STAY_CONNECTED_KEY,
+            translation_key=STAY_CONNECTED_KEY,
+            has_entity_name=True,
+        )
+        self._attr_unique_id = (
+            f"{coordinator.walkingpad_device.mac}-{self.entity_description.key}"
+        )
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, coordinator.walkingpad_device.mac)},
+            name=coordinator.walkingpad_device.name,
+            manufacturer="KingSmith",
+        )
+        super().__init__()
+
+    @property
+    def is_on(self) -> bool:
+        """Return the live stay_connected state from the device."""
+        return self.coordinator.walkingpad_device.stay_connected
+
+    async def async_added_to_hass(self) -> None:
+        """Restore state after HA restart and subscribe to coordinator updates."""
+        await super().async_added_to_hass()
+        last_state = await self.async_get_last_state()
+        if last_state is not None:
+            restored = last_state.state == "on"
+            _LOGGER.info(
+                "Restoring stay_connected state: %s (was %s)",
+                restored,
+                last_state.state,
+            )
+            self.coordinator.walkingpad_device.stay_connected = restored
+        else:
+            _LOGGER.info("No previous stay_connected state, defaulting to ON")
+            self.coordinator.walkingpad_device.stay_connected = True
+
+        # Subscribe to coordinator updates so our UI state refreshes when
+        # belt switches toggle stay_connected via the coordinator.
+        self.async_on_remove(
+            self.coordinator.async_add_listener(self._handle_coordinator_update)
+        )
+
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        """React to coordinator data updates by refreshing our HA state."""
+        self.async_write_ha_state()
+
+    async def async_turn_on(self, **kwargs: Any) -> None:
+        """Turn on — re-enable persistent BLE connection."""
+        await self.coordinator.async_set_stay_connected(True)
+        self.async_write_ha_state()
+
+    async def async_turn_off(self, **kwargs: Any) -> None:
+        """Turn off — disconnect BLE to free link for phone app."""
+        await self.coordinator.async_set_stay_connected(False)
+        self.async_write_ha_state()
