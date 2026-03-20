@@ -152,7 +152,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             return self.async_show_form(step_id="device", data_schema=schema)
 
         user_input[CONF_MAC] = self.discovered_device["address"]
-        await self.async_set_unique_id(self.discovered_device["address"])
+        await self.async_set_unique_id(dr.format_mac(self.discovered_device["address"]))
         self._abort_if_unique_id_configured()
 
         remote_control_data = user_input.get(CONF_REMOTE_CONTROL, {})

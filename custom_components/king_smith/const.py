@@ -1,7 +1,11 @@
 """Constants for the walkingpad integration."""
 
-from enum import Enum, IntEnum, unique
+from enum import Enum, unique
 from typing import Final, TypedDict
+
+# Re-export BeltState and ProtocolType from the library so that all
+# integration modules can continue importing them from .const.
+from walkingpad_controller import BeltState, ProtocolType
 
 DOMAIN = "king_smith"
 
@@ -12,17 +16,6 @@ CONF_MAC: Final = "mac"
 CONF_MODE: Final = "mode"
 CONF_NAME: Final = "name"
 CONF_PREFERRED_MODE: Final = "preferred_mode"
-
-
-@unique
-class BeltState(IntEnum):
-    """An enumeration of the possible belt states."""
-
-    STOPPED = 0
-    ACTIVE = 1
-    STANDBY = 5
-    STARTING = 9
-    UNKNOWN = 1000
 
 
 @unique
@@ -50,4 +43,5 @@ class WalkingPadStatus(TypedDict):
     session_running_time: int  # in seconds
     session_distance: int  # distance in meters
     session_steps: int
+    session_calories: int  # total energy in kcal (FTMS only)
     status_timestamp: float
