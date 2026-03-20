@@ -4,6 +4,19 @@
 [![GitHub Activity][commits-shield]][commits]
 [![License][license-shield]](LICENSE)
 
+---
+![Maintenance](https://img.shields.io/badge/Maintenance-Limited-orange.svg)
+
+> [!WARNING]
+> **Project Status: Limited Maintenance** > This project is no longer actively maintained. I may push occasional critical updates, but please do not expect new features or active support. Responses to Issues or PRs will be delayed or absent.
+
+### Forks & Alternatives
+**Feel free to fork this repository** if you wish to continue development!
+
+*@mcdax* has created a fork with support for new devices using the **FTMS** (Fitness Machine Service) protocol.  
+👉 **Check it out here:** [mcdax/hass-walkingpad](https://github.com/mcdax/hass-walkingpad)
+
+---
 
 **This integration will set up the following platforms.**
 
