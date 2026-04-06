@@ -35,6 +35,26 @@ class WalkingPad:
         self._callbacks = []
         self._connection_status = WalkingPadConnectionStatus.NOT_CONNECTED
         self._register_controller_callbacks()
+        
+        # Log de depuración
+        self._log_device_info()
+
+    def _log_device_info(self):
+        """Log device information for debugging."""
+        _LOGGER.debug("=== WalkingPad Device Info ===")
+        _LOGGER.debug("Name: %s", self._ble_device.name)
+        _LOGGER.debug("Address: %s", self._ble_device.address)
+        
+        # Intentar acceder a atributos disponibles
+        attrs_to_check = ['name', 'address', 'rssi', 'tx_power', 'details', 'advertisement_data', 'metadata']
+        for attr in attrs_to_check:
+            if hasattr(self._ble_device, attr):
+                try:
+                    value = getattr(self._ble_device, attr)
+                    if not callable(value):
+                        _LOGGER.debug("  %s: %s", attr, value)
+                except Exception as e:
+                    _LOGGER.debug("  %s: Error - %s", attr, e)
 
     def _register_controller_callbacks(self):
         self._controller.handler_cur_status = self._on_status_update
@@ -153,7 +173,7 @@ class WalkingPad:
                 self._connection_status = WalkingPadConnectionStatus.NOT_CONNECTED
 
     async def stop_belt(self) -> None:
-        """Start the belt."""
+        """Stop the belt."""
         if self._connection_status == WalkingPadConnectionStatus.NOT_CONNECTED:
             await self.connect()
         lock = self._begin_cmd()

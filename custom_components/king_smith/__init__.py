@@ -10,6 +10,8 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
+from homeassistant.helpers.device_registry import DeviceEntry
+from homeassistant.helpers import device_registry as dr
 
 from .const import CONF_MAC, CONF_NAME, DOMAIN
 from .coordinator import WalkingPadCoordinator
@@ -23,6 +25,7 @@ class WalkingPadIntegrationData(TypedDict):
 
     device: WalkingPad
     coordinator: WalkingPadCoordinator
+    device_entry: DeviceEntry
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -62,9 +65,26 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     walkingpad_device = WalkingPad(name, ble_device)
     coordinator = WalkingPadCoordinator(hass, walkingpad_device)
 
+    # Obtener nombre del dispositivo BLE
+    ble_name = ble_device.name or "WalkingPad"
+    
+    # Crear el dispositivo en el registro de dispositivos
+    device_registry = dr.async_get(hass)
+    device_entry = device_registry.async_get_or_create(
+        config_entry_id=entry.entry_id,
+        connections={(dr.CONNECTION_BLUETOOTH, address)},
+        identifiers={(DOMAIN, address)},
+        name=name or ble_name,
+        manufacturer="King Smith",
+        model=ble_name or "WalkingPad A1 Pro",
+        hw_version=None,
+        sw_version=None,
+    )
+
     integration_data: WalkingPadIntegrationData = {
         "device": walkingpad_device,
         "coordinator": coordinator,
+        "device_entry": device_entry,
     }
     hass.data[DOMAIN][entry.entry_id] = integration_data
 

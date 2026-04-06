@@ -17,6 +17,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.helpers.device_registry import DeviceInfo
 
 from . import WalkingPadIntegrationData
 from .const import DOMAIN, BeltState, WalkingPadMode, WalkingPadStatus
@@ -150,6 +151,17 @@ class WalkingPadSensor(
         self.entity_description = entity_description
         self._attr_unique_id = (
             f"{coordinator.walkingpad_device.mac}-{self.entity_description.key}"
+        )
+
+    @property
+    def device_info(self) -> DeviceInfo:
+        """Return device info."""
+        ble_name = self.coordinator.walkingpad_device._ble_device.name or "WalkingPad"
+        return DeviceInfo(
+            identifiers={(DOMAIN, self.coordinator.walkingpad_device.mac)},
+            name=self.coordinator.walkingpad_device.name,
+            manufacturer="King Smith",
+            model=ble_name or "WalkingPad A1 Pro",
         )
 
     @property
