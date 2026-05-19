@@ -23,6 +23,7 @@ from .const import (
     DOMAIN,
     PREFERRED_MODE_OPTIONS,
 )
+from .utils import get_connectable_ble_device
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -57,9 +58,7 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
 
     Data has the keys from STEP_USER_DATA_SCHEMA with values provided by the user.
     """
-    ble_device = bluetooth.async_ble_device_from_address(
-        hass, data[CONF_MAC], connectable=True
-    )
+    ble_device = get_connectable_ble_device(hass, data[CONF_MAC])
     if ble_device is None:
         raise CannotConnect
 
@@ -152,7 +151,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             return self.async_show_form(step_id="device", data_schema=schema)
 
         user_input[CONF_MAC] = self.discovered_device["address"]
-        await self.async_set_unique_id(self.discovered_device["address"])
+        await self.async_set_unique_id(
+            dr.format_mac(self.discovered_device["address"])
+        )
         self._abort_if_unique_id_configured()
 
         remote_control_data = user_input.get(CONF_REMOTE_CONTROL, {})

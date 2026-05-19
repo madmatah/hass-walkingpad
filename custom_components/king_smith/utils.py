@@ -1,8 +1,44 @@
 """Utility classes and functions for the walkingpad integration."""
 
-from typing import Generic, TypeVar
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Generic, TypeVar
+
+from homeassistant.components import bluetooth
+from homeassistant.core import HomeAssistant
+
+if TYPE_CHECKING:
+    from bleak.backends.device import BLEDevice
 
 T = TypeVar("T")
+
+
+def get_connectable_ble_device(
+    hass: HomeAssistant, address: str, connectable: bool = True
+) -> BLEDevice | None:
+    """Resolve a BLEDevice for GATT connections.
+
+    Prefer async_ble_device_from_address. If that is None (sparse advertisements or
+    multiple scanners), fall back to async_scanner_devices_by_address and use the
+    path with the strongest RSSI.
+    """
+    if device := bluetooth.async_ble_device_from_address(
+        hass, address, connectable=connectable
+    ):
+        return device
+    candidates = bluetooth.async_scanner_devices_by_address(
+        hass, address, connectable=connectable
+    )
+    if not candidates:
+        return None
+    best = max(
+        candidates,
+        key=lambda c: (
+            c.advertisement.rssi is not None,
+            c.advertisement.rssi or -256,
+        ),
+    )
+    return best.ble_device
 
 
 class TemporaryValue(Generic[T]):

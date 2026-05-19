@@ -13,6 +13,7 @@ from homeassistant.exceptions import ConfigEntryNotReady
 
 from .const import CONF_MAC, CONF_NAME, DOMAIN
 from .coordinator import WalkingPadCoordinator
+from .utils import get_connectable_ble_device
 from .walkingpad import WalkingPad
 
 PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.SWITCH, Platform.NUMBER]
@@ -44,9 +45,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data.setdefault(DOMAIN, {})
     address = entry.data.get(CONF_MAC)
 
-    ble_device = bluetooth.async_ble_device_from_address(
-        hass, entry.data.get(CONF_MAC), connectable=True
-    )
+    ble_device = get_connectable_ble_device(hass, entry.data.get(CONF_MAC))
     if ble_device is None:
         # Check if any HA scanner on:
         count_scanners = bluetooth.async_scanner_count(hass, connectable=True)
@@ -59,7 +58,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         raise ConfigEntryNotReady(f"Could not find Walkingpad with address {address}")
 
     name = entry.data.get(CONF_NAME) or DOMAIN
-    walkingpad_device = WalkingPad(name, ble_device)
+    walkingpad_device = WalkingPad(hass, name, ble_device)
     coordinator = WalkingPadCoordinator(hass, walkingpad_device)
 
     integration_data: WalkingPadIntegrationData = {
